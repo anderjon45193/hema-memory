@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HEMA★MEMORY — Visual Hematology Study System</title>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root {
+  --neon-pink: #FF2D7B;
+  --neon-cyan: #00F0FF;
+  --neon-yellow: #FFE93E;
+  --neon-green: #39FF14;
+  --deep-purple: #1a0a2e;
+  --mid-purple: #2d1b4e;
+  --card-bg: rgba(30, 15, 60, 0.85);
+  --text-light: #f0e6ff;
+  --speed-line: rgba(255, 255, 255, 0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--deep-purple);
+  color: var(--text-light);
+  font-family: 'Zen Maru Gothic', sans-serif;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+/* ===== SPEED LINES BG ===== */
+.speed-lines {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.speed-lines::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: repeating-linear-gradient(
+    105deg,
+    transparent 0px,
+    transparent 40px,
+    var(--speed-line) 40px,
+    var(--speed-line) 41px
+  );
+  animation: speedShift 20s linear infinite;
+}
+@keyframes speedShift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(80px); }
+}
+
+/* ===== STAR FIELD ===== */
+.stars {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s ease-in-out infinite alternate;
+}
+@keyframes twinkle {
+  0% { opacity: 0.2; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.5); }
+}
+
+/* ===== SCANLINES ===== */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+}
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+.hero-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,45,123,0.15) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulseGlow 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes pulseGlow {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+}
+
+.hero-badge {
+  display: inline-block;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 3px;
+  color: var(--neon-cyan);
+  border: 1px solid var(--neon-cyan);
+  padding: 6px 18px;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  animation: flickerBadge 4s infinite;
+  text-shadow: 0 0 8px var(--neon-cyan);
+}
+@keyframes flickerBadge {
+  0%, 95%, 100% { opacity: 1; }
+  96% { opacity: 0.4; }
+  97% { opacity: 1; }
+  98% { opacity: 0.3; }
+}
+
+.hero-title {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+.hero-title .main-text {
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-yellow), var(--neon-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px rgba(255,45,123,0.4));
+}
+.hero-title .star-icon {
+  -webkit-text-fill-color: var(--neon-yellow);
+  display: inline-block;
+  animation: spinStar 6s linear infinite;
+  filter: drop-shadow(0 0 12px var(--neon-yellow));
+}
+@keyframes spinStar {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.hero-sub {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: rgba(240,230,255,0.7);
+  margin-bottom: 0.5rem;
+  letter-spacing: 2px;
+}
+
+.hero-tagline {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.5rem, 1.2vw, 0.7rem);
+  color: var(--neon-green);
+  letter-spacing: 2px;
+  margin-bottom: 2.5rem;
+  text-shadow: 0 0 10px var(--neon-green);
+  animation: textGlitch 8s infinite;
+}
+@keyframes textGlitch {
+  0%, 90%, 100% { transform: translate(0); }
+  91% { transform: translate(-2px, 1px); }
+  92% { transform: translate(2px, -1px); }
+  93% { transform: translate(0); }
+}
+
+.hero-stats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+.stat-box {
+  background: var(--card-bg);
+  border: 1px solid rgba(0,240,255,0.2);
+  padding: 1rem 1.5rem;
+  text-align: center;
+  position: relative;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+.stat-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--neon-cyan);
+  box-shadow: 0 0 8px var(--neon-cyan);
+}
+.stat-num {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: 2rem;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 15px rgba(255,233,62,0.5);
+}
+.stat-label {
+  font-size: 0.75rem;
+  color: rgba(240,230,255,0.5);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.cta-btn {
+  display: inline-block;
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: 1.1rem;
+  color: var(--deep-purple);
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-yellow));
+  padding: 1rem 3rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: relative;
+  transition: all 0.3s;
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+.cta-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(255,45,123,0.5), 0 0 60px rgba(255,233,62,0.3);
+}
+
+/* ===== NAV TABS ===== */
+.nav-section {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(26,10,46,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0,240,255,0.15);
+  padding: 0.5rem 0;
+}
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  padding: 0.5rem 1rem;
+  scrollbar-width: none;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+.nav-tab {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  padding: 8px 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: transparent;
+  color: rgba(240,230,255,0.5);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+.nav-tab:hover, .nav-tab.active {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  text-shadow: 0 0 8px var(--neon-pink);
+  background: rgba(255,45,123,0.08);
+}
+
+/* ===== SECTION HEADERS ===== */
+.section-block {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 2rem;
+}
+.section-header {
+  margin-bottom: 2rem;
+  position: relative;
+}
+.section-num {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: clamp(4rem, 10vw, 8rem);
+  color: rgba(255,45,123,0.06);
+  position: absolute;
+  top: -2rem;
+  left: -1rem;
+  z-index: 0;
+  line-height: 1;
+}
+.section-title {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  color: var(--neon-pink);
+  text-shadow: 0 0 20px rgba(255,45,123,0.3);
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0.3rem;
+}
+.section-subtitle {
+  font-size: 0.9rem;
+  color: rgba(240,230,255,0.4);
+  letter-spacing: 1px;
+}
+.section-divider {
+  height: 2px;
+  background: linear-gradient(90deg, var(--neon-pink), transparent);
+  margin-top: 1rem;
+  box-shadow: 0 0 10px rgba(255,45,123,0.3);
+}
+
+/* ===== FACT CARDS ===== */
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+}
+
+.fact-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+}
+.fact-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.fact-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0,240,255,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(0,240,255,0.05);
+}
+.fact-card:hover::before { opacity: 1; }
+
+.card-id {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: 2.5rem;
+  color: rgba(255,255,255,0.03);
+  line-height: 1;
+  z-index: 0;
+}
+
+.card-content {
+  padding: 1.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.card-fact {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--neon-yellow);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  text-shadow: 0 0 8px rgba(255,233,62,0.15);
+}
+
+.image-pair {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+.image-pair::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--neon-pink), var(--neon-cyan));
+}
+
+.img-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  letter-spacing: 2px;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.img-label.top { color: var(--neon-pink); }
+.img-label.base { color: var(--neon-cyan); }
+
+.img-label .arrow {
+  display: inline-block;
+  font-size: 0.7rem;
+}
+
+.img-desc {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: rgba(240,230,255,0.8);
+  padding-left: 0.25rem;
+}
+
+.img-separator {
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 0.6rem 0;
+}
+
+.card-why {
+  font-size: 0.7rem;
+  color: rgba(240,230,255,0.35);
+  line-height: 1.5;
+  font-style: italic;
+  border-top: 1px dashed rgba(255,255,255,0.06);
+  padding-top: 0.6rem;
+}
+
+/* ===== MODAL OVERLAY ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 4, 22, 0.88);
+  backdrop-filter: blur(12px);
+}
+.modal-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(165deg, rgba(45, 27, 78, 0.97), rgba(26, 10, 46, 0.98));
+  border: 1px solid rgba(0,240,255,0.15);
+  box-shadow: 0 0 60px rgba(255,45,123,0.12), 0 0 120px rgba(0,240,255,0.06), 0 30px 80px rgba(0,0,0,0.6);
+  transform: translateY(30px) scale(0.95);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,240,255,0.2) transparent;
+}
+.modal-overlay.open .modal-card {
+  transform: translateY(0) scale(1);
+}
+.modal-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-yellow));
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.4);
+  color: rgba(240,230,255,0.6);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-family: 'Zen Maru Gothic', sans-serif;
+}
+.modal-close:hover {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  box-shadow: 0 0 12px rgba(255,45,123,0.3);
+}
+
+.modal-id {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: 4rem;
+  color: rgba(255,255,255,0.04);
+  line-height: 1;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.modal-body {
+  padding: 2.5rem 2rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.modal-fact {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--neon-yellow);
+  line-height: 1.6;
+  margin-bottom: 1.75rem;
+  text-shadow: 0 0 12px rgba(255,233,62,0.15);
+  padding-right: 2rem;
+}
+
+.modal-image-pair {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.05);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+.modal-image-pair::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--neon-pink), var(--neon-cyan));
+  box-shadow: 0 0 8px rgba(0,240,255,0.2);
+}
+
+.modal-img-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 3px;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.modal-img-label.top { color: var(--neon-pink); text-shadow: 0 0 6px rgba(255,45,123,0.3); }
+.modal-img-label.base { color: var(--neon-cyan); text-shadow: 0 0 6px rgba(0,240,255,0.3); }
+.modal-img-label .arrow { font-size: 0.9rem; }
+
+.modal-img-desc {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: rgba(240,230,255,0.9);
+  padding-left: 0.5rem;
+}
+
+.modal-img-separator {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.08), transparent);
+  margin: 1rem 0;
+}
+
+.modal-why {
+  font-size: 0.9rem;
+  color: rgba(240,230,255,0.5);
+  line-height: 1.7;
+  font-style: italic;
+  border-top: 1px dashed rgba(255,255,255,0.08);
+  padding-top: 1rem;
+}
+.modal-why strong {
+  color: rgba(240,230,255,0.7);
+  font-style: normal;
+}
+
+.modal-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+.modal-nav-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  letter-spacing: 2px;
+  padding: 10px 18px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.3);
+  color: rgba(240,230,255,0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.modal-nav-btn:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0,240,255,0.15);
+}
+.modal-nav-btn:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+.modal-nav-btn:disabled:hover {
+  border-color: rgba(255,255,255,0.1);
+  color: rgba(240,230,255,0.5);
+  box-shadow: none;
+}
+.modal-counter {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  color: rgba(240,230,255,0.25);
+  letter-spacing: 2px;
+}
+
+/* ESC hint */
+.modal-esc-hint {
+  text-align: center;
+  margin-top: 1rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.35rem;
+  color: rgba(240,230,255,0.15);
+  letter-spacing: 2px;
+}
+
+/* ===== APPENDIX ===== */
+.appendix-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.5rem;
+}
+.appendix-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  background: rgba(30,15,60,0.5);
+  border-left: 2px solid rgba(0,240,255,0.15);
+  transition: all 0.2s;
+}
+.appendix-item:hover {
+  border-left-color: var(--neon-cyan);
+  background: rgba(0,240,255,0.03);
+}
+.appendix-term {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--neon-cyan);
+  min-width: 120px;
+  flex-shrink: 0;
+}
+.appendix-arrow {
+  color: var(--neon-pink);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+.appendix-image {
+  font-size: 0.78rem;
+  color: rgba(240,230,255,0.6);
+}
+
+/* ===== FOOTER ===== */
+.site-footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 4rem 2rem;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+.footer-logo {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+.footer-text {
+  font-size: 0.75rem;
+  color: rgba(240,230,255,0.3);
+}
+
+/* ===== CORNER DECORATIONS ===== */
+.corner-deco {
+  position: fixed;
+  z-index: 9997;
+  pointer-events: none;
+}
+.corner-deco.tl {
+  top: 10px;
+  left: 10px;
+  width: 40px;
+  height: 40px;
+  border-top: 2px solid var(--neon-cyan);
+  border-left: 2px solid var(--neon-cyan);
+  opacity: 0.3;
+}
+.corner-deco.br {
+  bottom: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  border-bottom: 2px solid var(--neon-pink);
+  border-right: 2px solid var(--neon-pink);
+  opacity: 0.3;
+}
+
+/* ===== SEARCH ===== */
+.search-wrapper {
+  max-width: 500px;
+  margin: 0 auto 2rem;
+  position: relative;
+}
+.search-input {
+  width: 100%;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 0.9rem;
+  padding: 0.8rem 1.2rem 0.8rem 2.5rem;
+  background: rgba(30,15,60,0.8);
+  border: 1px solid rgba(0,240,255,0.15);
+  color: var(--text-light);
+  outline: none;
+  transition: all 0.3s;
+}
+.search-input::placeholder { color: rgba(240,230,255,0.3); }
+.search-input:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0,240,255,0.1);
+}
+.search-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(0,240,255,0.4);
+  font-size: 0.9rem;
+}
+
+/* ===== HOW-TO GUIDE ===== */
+.guide-section {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 3rem;
+}
+.guide-title {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  text-align: center;
+  margin-bottom: 0.4rem;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 25px rgba(0,240,255,0.25);
+}
+.guide-title-jp {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  text-align: center;
+  font-size: 0.95rem;
+  color: rgba(240,230,255,0.3);
+  margin-bottom: 2.5rem;
+  letter-spacing: 3px;
+}
+.guide-intro {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: rgba(240,230,255,0.7);
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 3rem;
+}
+.guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.guide-step {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+.guide-step:hover {
+  border-color: rgba(0,240,255,0.12);
+}
+.guide-step::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--neon-cyan), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.guide-step:hover::before { opacity: 1; }
+
+.step-number {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--neon-pink);
+  text-shadow: 0 0 15px rgba(255,45,123,0.2);
+  flex-shrink: 0;
+  width: 50px;
+  text-align: center;
+  opacity: 0.7;
+}
+.step-content { flex: 1; }
+.step-title {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: 1rem;
+  color: var(--neon-yellow);
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 8px rgba(255,233,62,0.1);
+}
+.step-desc {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: rgba(240,230,255,0.65);
+}
+.step-desc em {
+  color: var(--neon-cyan);
+  font-style: normal;
+}
+.step-desc strong {
+  color: rgba(240,230,255,0.9);
+}
+
+/* Example demo card */
+.guide-demo {
+  margin-top: 2.5rem;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(0,240,255,0.1);
+  padding: 2rem;
+  position: relative;
+}
+.guide-demo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px dashed rgba(0,240,255,0.08);
+  margin: 6px;
+  pointer-events: none;
+}
+.demo-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: var(--neon-green);
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 8px rgba(57,255,20,0.3);
+}
+.demo-fact {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--neon-yellow);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+.demo-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 1.5rem;
+}
+.demo-block {
+  text-align: center;
+  padding: 1.2rem 2rem;
+  max-width: 420px;
+  width: 100%;
+}
+.demo-block.top-block {
+  background: rgba(255,45,123,0.06);
+  border: 1px solid rgba(255,45,123,0.15);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+}
+.demo-block.base-block {
+  background: rgba(0,240,255,0.04);
+  border: 1px solid rgba(0,240,255,0.12);
+  border-top: 1px dashed rgba(255,255,255,0.08);
+  border-radius: 0 0 4px 4px;
+}
+.demo-block-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  letter-spacing: 2px;
+  margin-bottom: 0.4rem;
+}
+.demo-block.top-block .demo-block-label { color: var(--neon-pink); }
+.demo-block.base-block .demo-block-label { color: var(--neon-cyan); }
+.demo-block-text {
+  font-size: 0.95rem;
+  color: rgba(240,230,255,0.85);
+  line-height: 1.5;
+}
+.demo-touch-line {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.35rem;
+  color: rgba(240,230,255,0.2);
+  letter-spacing: 2px;
+  text-align: center;
+  margin: 0;
+  padding: 3px 0;
+  background: rgba(255,255,255,0.02);
+  max-width: 420px;
+  width: 100%;
+}
+.demo-explanation {
+  font-size: 0.85rem;
+  color: rgba(240,230,255,0.45);
+  text-align: center;
+  line-height: 1.6;
+  font-style: italic;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.guide-rules {
+  margin-top: 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+.guide-rule {
+  background: rgba(0,0,0,0.2);
+  border-left: 2px solid var(--neon-green);
+  padding: 1rem 1.2rem;
+}
+.guide-rule-icon {
+  font-size: 1.2rem;
+  margin-bottom: 0.4rem;
+}
+.guide-rule-text {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: rgba(240,230,255,0.55);
+}
+.guide-rule-text strong {
+  color: var(--neon-green);
+  font-size: 0.75rem;
+  text-shadow: 0 0 6px rgba(57,255,20,0.15);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .facts-grid { grid-template-columns: 1fr; }
+  .hero-stats { gap: 1rem; }
+  .stat-box { padding: 0.75rem 1rem; }
+  .nav-tab { font-size: 0.4rem; padding: 6px 10px; }
+  .appendix-grid { grid-template-columns: 1fr; }
+  .guide-step { flex-direction: column; gap: 0.75rem; }
+  .step-number { width: auto; }
+  .guide-rules { grid-template-columns: 1fr; }
+  .modal-body { padding: 2rem 1.25rem 1.5rem; }
+  .modal-fact { font-size: 1.05rem; }
+}
+
+/* ===== ENTRANCE ANIMATIONS ===== */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered card entrance */
+.fact-card {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.fact-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+</style>
+</head>
+<body>
+
+<div class="speed-lines"></div>
+<div class="stars" id="stars"></div>
+<div class="scanlines"></div>
+<div class="corner-deco tl"></div>
+<div class="corner-deco br"></div>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="modal-card" id="modalCard">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-id" id="modalId"></div>
+    <div class="modal-body">
+      <div class="modal-fact" id="modalFact"></div>
+      <div class="modal-image-pair">
+        <div class="modal-img-label top"><span class="arrow">▲</span> TOP IMAGE</div>
+        <div class="modal-img-desc" id="modalTop"></div>
+        <div class="modal-img-separator"></div>
+        <div class="modal-img-label base"><span class="arrow">▼</span> BASE IMAGE</div>
+        <div class="modal-img-desc" id="modalBase"></div>
+      </div>
+      <div class="modal-why" id="modalWhy"></div>
+      <div class="modal-nav">
+        <button class="modal-nav-btn" id="modalPrev">◄ PREV</button>
+        <span class="modal-counter" id="modalCounter"></span>
+        <button class="modal-nav-btn" id="modalNext">NEXT ►</button>
+      </div>
+      <div class="modal-esc-hint">ESC OR CLICK OUTSIDE TO CLOSE</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge">MLS / ASCP Board Prep</div>
+  <h1 class="hero-title">
+    <span class="main-text">HEMA</span><span class="star-icon">★</span><span class="main-text">MEMORY</span>
+  </h1>
+  <p class="hero-sub">ヘマトロジー・メモリー・システム</p>
+  <p class="hero-tagline">// VISUAL MEMORIZATION SYSTEM FOR HEMATOLOGY //</p>
+  <div class="hero-stats">
+    <div class="stat-box">
+      <div class="stat-num">125</div>
+      <div class="stat-label">Facts</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">7</div>
+      <div class="stat-label">Sections</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">250</div>
+      <div class="stat-label">Image Pairs</div>
+    </div>
+  </div>
+  <a href="#content" class="cta-btn">BEGIN STUDY ▸</a>
+</section>
+
+<!-- ===== HOW TO MEMORIZE GUIDE ===== -->
+<section class="guide-section">
+  <h2 class="guide-title">HOW TO MEMORIZE</h2>
+  <p class="guide-title-jp">記憶術ガイド — THE METHOD</p>
+
+  <p class="guide-intro">
+    This guide uses a <strong>visual image-linking system</strong> — a proven memorization technique where abstract facts become vivid, concrete pictures in your mind. No stories, no movement. Just two frozen images, stacked and touching.
+  </p>
+
+  <div class="guide-steps">
+    <div class="guide-step fade-up">
+      <div class="step-number">01</div>
+      <div class="step-content">
+        <div class="step-title">CONVERT WORDS TO IMAGES</div>
+        <div class="step-desc">
+          Every term gets turned into a <strong>concrete, visual image</strong> — the first picture that pops into your head. Abstract or medical words become images through <em>sound-alikes</em>: "warfarin" sounds like <em>"war fan"</em>, so picture a Japanese battle fan. "Heparin" becomes a <em>"hair pin"</em>. "PTT" becomes <em>"putt-putt golf"</em>. The sillier or more vivid, the stronger the memory.
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-step fade-up">
+      <div class="step-number">02</div>
+      <div class="step-content">
+        <div class="step-title">STACK TWO IMAGES — BASE + TOP</div>
+        <div class="step-desc">
+          Each fact is encoded as <strong>two images stacked vertically</strong>. The <em>base image</em> sits on the bottom. The <em>top image</em> sits directly on top of it, <strong>physically touching</strong> the base. This point of contact is what creates the link in your memory. Think of it like building a small sculpture — one object resting on another.
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-step fade-up">
+      <div class="step-number">03</div>
+      <div class="step-content">
+        <div class="step-title">KEEP IT STATIC — NO ACTIONS, NO STORIES</div>
+        <div class="step-desc">
+          This is critical: <strong>do not animate the scene</strong>. No movement, no storylines, no one doing anything. Just two objects frozen in place, touching each other. A war fan <em>balanced on</em> a PT ball — not "a war fan flying toward a ball." The stillness forces your brain to encode the spatial relationship, which is far more durable than a narrative.
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-step fade-up">
+      <div class="step-number">04</div>
+      <div class="step-content">
+        <div class="step-title">MAKE IT VIVID AND SPECIFIC</div>
+        <div class="step-desc">
+          The more <strong>detailed and unusual</strong> the image, the better it sticks. Don't just think "a fan" — picture a <em>red and gold Japanese war fan with sharp edges</em>. Don't think "a ball" — picture a <em>bright blue physical therapy exercise ball, slightly deflated</em>. Texture, color, size, and absurdity all help. If it makes you smile, it'll stick.
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-step fade-up">
+      <div class="step-number">05</div>
+      <div class="step-content">
+        <div class="step-title">RECALL = DECODE THE IMAGES</div>
+        <div class="step-desc">
+          When you need the fact, <strong>picture the scene first</strong>, then decode it. You see a war fan on a PT ball → war fan = warfarin, PT ball = prothrombin time → <em>"PT monitors warfarin."</em> With practice, this becomes instant. The images are just scaffolding — eventually you'll know the facts directly.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE EXAMPLE -->
+  <div class="guide-demo fade-up">
+    <div class="demo-label">★ LIVE EXAMPLE ★</div>
+    <div class="demo-fact">
+      "The Constitution was signed in Pennsylvania"
+    </div>
+    <div class="demo-visual">
+      <div class="demo-block top-block">
+        <div class="demo-block-label">▲ TOP IMAGE</div>
+        <div class="demo-block-text">A van made entirely of pencils</div>
+      </div>
+      <div class="demo-touch-line">— TOUCHING —</div>
+      <div class="demo-block base-block">
+        <div class="demo-block-label">▼ BASE IMAGE</div>
+        <div class="demo-block-text">A yellow construction hard hat</div>
+      </div>
+    </div>
+    <div class="demo-explanation">
+      "Constitution" sounds like "construction" → <strong>hard hat</strong><br>
+      "Pennsylvania" sounds like "pencil-vania" → <strong>van made of pencils</strong><br>
+      A pencil-van sitting on top of a hard hat. Static. Touching. Done.
+    </div>
+  </div>
+
+  <!-- GOLDEN RULES -->
+  <div class="guide-rules">
+    <div class="guide-rule fade-up">
+      <div class="guide-rule-icon">🧊</div>
+      <div class="guide-rule-text"><strong>FROZEN</strong><br>Images are always still — no movement, no actions, no stories.</div>
+    </div>
+    <div class="guide-rule fade-up">
+      <div class="guide-rule-icon">🔗</div>
+      <div class="guide-rule-text"><strong>TOUCHING</strong><br>The two images must be in physical contact — stacked, resting, sitting on.</div>
+    </div>
+    <div class="guide-rule fade-up">
+      <div class="guide-rule-icon">🎨</div>
+      <div class="guide-rule-text"><strong>VIVID</strong><br>Use the first image that pops into your head. Weird and specific beats generic.</div>
+    </div>
+    <div class="guide-rule fade-up">
+      <div class="guide-rule-icon">🔊</div>
+      <div class="guide-rule-text"><strong>SOUND-ALIKE</strong><br>Turn abstract words into concrete images using phonetic similarity.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== NAV ===== -->
+<nav class="nav-section" id="content">
+  <div class="nav-inner" id="navTabs"></div>
+</nav>
+
+<!-- ===== SEARCH ===== -->
+<div style="max-width:1200px; margin:2rem auto 0; padding:0 1.5rem; position:relative; z-index:1;">
+  <div class="search-wrapper">
+    <span class="search-icon">⌕</span>
+    <input type="text" class="search-input" id="searchInput" placeholder="Search facts... (e.g. warfarin, sickle cell, Auer rod)">
+  </div>
+</div>
+
+<!-- ===== CONTENT ===== -->
+<main id="mainContent"></main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <div class="footer-logo">HEMA★MEMORY</div>
+  <p class="footer-text">Visual Memorization System for Hematology Board Preparation</p>
+  <p class="footer-text" style="margin-top:0.5rem; color:rgba(240,230,255,0.15);">Built with love for the lab ♥</p>
+</footer>
+
+<script>
+// ===== DATA =====
+const sections = [
+  {
+    id: "coag",
+    title: "COAGULATION & HEMOSTASIS",
+    subtitle: "Pathways, Factors, Lab Tests & Therapeutic Ranges",
+    facts: [
+      { id:1, fact:"Factor VII has the shortest half-life (~4-6 hours) of all coagulation factors", top:"A tiny hourglass with barely any sand left, sitting on top of the ice 7", base:"A giant number 7 made of ice, cracking and melting", why:"7 = Factor VII. Ice = fragile/short-lived. Tiny hourglass = shortest half-life." },
+      { id:2, fact:"PT (Prothrombin Time) monitors the Extrinsic Pathway", top:"An EXIT sign glowing red, resting on top of the ball", base:"A physical therapy exercise ball (PT = Physical Therapy)", why:"PT ball = Prothrombin Time. EXIT sign = Extrinsic pathway." },
+      { id:3, fact:"PT/INR monitors Warfarin therapy", top:"A Japanese war fan (war-fan = warfarin) balanced on the ball", base:"A physical therapy exercise ball (PT)", why:"PT ball = PT test. War fan = Warfarin." },
+      { id:4, fact:"PTT/aPTT monitors the Intrinsic Pathway", top:"A door with a sign reading 'ENTER' resting on the golf ball", base:"A putt-putt miniature golf club and ball", why:"Putt-putt = PTT. ENTER door = Intrinsic (internal entry)." },
+      { id:5, fact:"PTT/aPTT monitors Heparin therapy", top:"A giant hair pin stuck into the top of the golf ball", base:"A putt-putt miniature golf club and ball", why:"Putt-putt = PTT. Hair pin = Heparin." },
+      { id:6, fact:"Vitamin K-dependent factors are II, VII, IX, X (mnemonic: 1972)", top:"A sparkly disco ball with '1972' printed on it, sitting on the kale K", base:"A giant green letter K made of kale leaves", why:"Kale K = Vitamin K. Disco ball 1972 = factors 10, 9, 7, 2." },
+      { id:7, fact:"Warfarin inhibits Vitamin K-dependent factors (II, VII, IX, X)", top:"A giant green kale letter K being crushed under the war fan's weight, with a '1972' tag", base:"A Japanese war fan (warfarin)", why:"War fan = Warfarin. Crushed kale K with 1972 = inhibits Vitamin K factors." },
+      { id:8, fact:"Normal PT range is approximately 11-13.5 seconds", top:"A clock showing 11 o'clock with the number 13 scratched into its face", base:"A physical therapy exercise ball (PT)", why:"PT ball = PT test. Clock at 11 with 13 = range 11-13.5 seconds." },
+      { id:9, fact:"Therapeutic INR range is 2.0-3.0 for most conditions", top:"Two dice showing 2 and 3, sitting inside the inner tube hole", base:"A pool inner tube (INR = inner)", why:"Inner tube = INR. Dice 2 and 3 = therapeutic range 2.0-3.0." },
+      { id:10, fact:"Extrinsic pathway: Tissue Factor (III) + Factor VII activate Factor X", top:"A tissue box with the number 7 printed on it, sitting on the EXIT sign", base:"An EXIT sign (extrinsic)", why:"EXIT = extrinsic. Tissue box = Tissue Factor. Number 7 = Factor VII." },
+      { id:11, fact:"Intrinsic pathway factors: XII, XI, IX, VIII", top:"A dozen (12) eggs, with one (11) cracked, next to a cat (9 lives) holding a figure-8 pretzel", base:"A door with 'ENTER' sign (intrinsic = internal)", why:"ENTER = intrinsic. Dozen=XII, one cracked=XI, cat=IX, figure-8=VIII." },
+      { id:12, fact:"Common pathway factors: X, V, II (prothrombin), I (fibrinogen)", top:"A V-shaped victory sign holding a pair (II) of fiber (fibrinogen) ropes", base:"A Roman numeral X made of crossed swords", why:"X swords = Factor X. V sign = Factor V. Pair = II. Fiber ropes = I." },
+      { id:13, fact:"Thrombin Time (TT) measures fibrinogen to fibrin conversion", top:"A bundle of fiber optic cables turning into a fishing net (fibrinogen → fibrin)", base:"A thumb (thrombin/thumb-in) giving thumbs up", why:"Thumb = Thrombin Time. Fiber cables to net = fibrinogen → fibrin." },
+      { id:14, fact:"D-dimer is elevated in DIC", top:"A pair of dice scattered everywhere (DIC = dice, disseminated = scattered)", base:"Two letter D's stuck together like a dimer (D-dimer)", why:"Two D's = D-dimer. Scattered dice = DIC." },
+      { id:15, fact:"Factor XIII is the fibrin-stabilizing factor (cross-links fibrin)", top:"A fishing net with extra cross-stitching making it super sturdy, draped over the cat", base:"A black cat (13 = unlucky, black cat)", why:"Black cat = 13. Reinforced net = fibrin stabilization/cross-linking." },
+      { id:16, fact:"Heparin enhances Antithrombin III (AT III)", top:"A superhero cape with 'AT 3' on it, draped over the hair pin", base:"A giant hair pin (heparin)", why:"Hair pin = heparin. Superhero cape AT3 = enhances Antithrombin III." },
+      { id:17, fact:"Protamine sulfate reverses Heparin", top:"A protein shake bottle labeled 'PRO' smashing into the hair pin, bending it", base:"A giant hair pin (heparin)", why:"Hair pin = heparin. PRO protein shake = protamine sulfate." },
+      { id:18, fact:"Vitamin K reverses Warfarin", top:"A giant green kale letter K crushing the war fan flat", base:"A Japanese war fan (warfarin)", why:"War fan = warfarin. Kale K = Vitamin K reversal." },
+      { id:19, fact:"Mixing study: correction = factor deficiency; no correction = inhibitor", top:"Two bottles: one 'FIX' (correction = deficiency) and one 'BLOCK' (no correction = inhibitor)", base:"A mixing bowl with a big spoon", why:"Mixing bowl = mixing study. FIX = deficiency. BLOCK = inhibitor." },
+      { id:20, fact:"Lupus anticoagulant causes prolonged PTT but is associated with thrombosis", top:"A blood clot shaped like a red ball sitting on the wolf's head", base:"A wolf (lupus = wolf in Latin)", why:"Wolf = lupus. Red clot ball = causes clotting despite prolonged PTT." },
+      { id:21, fact:"von Willebrand Disease is the most common inherited bleeding disorder", top:"A van with 'VW' logo parked on top of the crown", base:"A crown (most common = king/queen of bleeding disorders)", why:"Crown = most common. VW van = von Willebrand Disease." },
+      { id:22, fact:"Factor VIII deficiency = Hemophilia A", top:"A big red letter A dripping blood, sitting on the ice rink surface", base:"A figure-8 ice skating rink", why:"Figure 8 = Factor VIII. Bloody A = Hemophilia A." },
+      { id:23, fact:"Factor IX deficiency = Hemophilia B (Christmas Disease)", top:"A Christmas tree sitting on the cat's back", base:"A cat with 9 lives (Factor IX)", why:"Cat with 9 lives = Factor IX. Christmas tree = Hemophilia B." },
+      { id:24, fact:"Hemophilia A and B are X-linked recessive", top:"A giant blue X chromosome with a male stick figure, resting on top of both", base:"A big red letter A and a Christmas tree side by side", why:"A + Christmas tree = Hemophilia A & B. Blue X = X-linked recessive." },
+      { id:25, fact:"Bleeding Time tests platelet function (primary hemostasis)", top:"A dinner plate (platelet) balanced on top of the clock", base:"A grandfather clock with blood dripping from it (Bleeding Time)", why:"Bleeding clock = BT. Dinner plate = platelet function." },
+      { id:26, fact:"Ristocetin tests for von Willebrand Factor activity", top:"A VW van sitting on the wristwatch face", base:"A wristwatch (ristocetin = wrist-o-cetin)", why:"Wristwatch = ristocetin. VW van = von Willebrand Factor." },
+      { id:27, fact:"Bernard-Soulier Syndrome: giant platelets, decreased GPIb", top:"A massive oversized dinner plate on the bear's head, with a '1b' tag missing", base:"A giant bear wearing a French beret", why:"Bear with beret = Bernard-Soulier. Giant plate = giant platelets." },
+      { id:28, fact:"Glanzmann Thrombasthenia: normal platelets, deficient GPIIb/IIIa", top:"Normal dinner plates stacked on the glasses, with a '2b/3a' tag missing", base:"A pair of glass spectacles (Glanzmann = glass-man)", why:"Glass spectacles = Glanzmann. Normal plates = normal-sized platelets." },
+    ]
+  },
+  {
+    id: "rbc",
+    title: "RED BLOOD CELLS & ANEMIA",
+    subtitle: "Normal Values, Classifications, Morphology & Iron Studies",
+    facts: [
+      { id:31, fact:"Normal Hemoglobin: Male 14-18 g/dL, Female 12-16 g/dL", top:"A male stick figure holding '14-18' and female holding '12-16', standing on the globe", base:"A globe colored red (hemoglobin = globe)", why:"Red globe = hemoglobin. Male 14-18, Female 12-16." },
+      { id:32, fact:"Normal Hematocrit: Male 42-52%, Female 36-48%", top:"Male sign '42-52' and female sign '36-48' sitting in the cracked hat", base:"A hat with a crack in it (hema-to-crit = hat-o-crit)", why:"Cracked hat = hematocrit. Male 42-52%, Female 36-48%." },
+      { id:33, fact:"MCV classifies anemias: <80 microcytic, 80-100 normocytic, >100 macrocytic", top:"Three boxes: tiny '<80', medium '80-100', huge '>100'", base:"A moving van (MCV = Moving Corporate Van)", why:"Moving van = MCV. Small/medium/large = micro/normo/macrocytic." },
+      { id:34, fact:"Iron Deficiency Anemia: decreased iron, decreased ferritin, increased TIBC, microcytic/hypochromic", top:"A tiny van (microcytic) with pale paint (hypochromic) on the broken iron", base:"A clothes iron that is rusty and broken (iron deficiency)", why:"Broken iron = IDA. Tiny pale van = microcytic hypochromic." },
+      { id:35, fact:"Ferritin is the best indicator of iron stores", top:"A treasure chest (iron stores) with the ferret sitting inside it", base:"A ferret (ferritin = ferret-in)", why:"Ferret = ferritin. Treasure chest = iron stores." },
+      { id:36, fact:"TIBC is increased in iron deficiency", top:"An empty bucket with arms reaching up, on top of the tie", base:"A tie with the letters BC on it (TIBC = Tie-BC)", why:"Tie-BC = TIBC. Empty bucket = increased binding capacity." },
+      { id:37, fact:"Anemia of Chronic Disease: decreased iron, increased ferritin, decreased TIBC", top:"A fat ferret (increased ferritin) holding a deflated tie-BC (decreased TIBC)", base:"A clock stuck on repeat (chronic = repeating)", why:"Looping clock = chronic. Fat ferret = ↑ferritin. Deflated tie = ↓TIBC." },
+      { id:38, fact:"B12/Folate deficiency causes macrocytic/megaloblastic anemia", top:"A giant oversized van (macrocytic, large MCV >100)", base:"A bee holding the number 12, next to folded foil (B12 + folate)", why:"Bee-12 + foil = B12/Folate. Giant van = macrocytic." },
+      { id:39, fact:"Hypersegmented neutrophils in B12/Folate deficiency", top:"A neutron star with extra segments/lobes sprouting from it", base:"A bee holding number 12 next to folded foil", why:"Bee-12 + foil = B12/Folate. Extra-lobed star = hypersegmented neutrophils." },
+      { id:40, fact:"Pernicious Anemia: B12 deficiency from lack of Intrinsic Factor", top:"A bee with '12' trapped inside the purse, with missing ENTER door", base:"A purse with teeth (pernicious = purse-nicious)", why:"Toothy purse = pernicious. Bee-12 = B12. Missing door = no intrinsic factor." },
+      { id:41, fact:"Sickle Cell Disease: HbS, valine replaces glutamic acid at position 6", top:"A valentine heart card (valine) with number 6, sitting on the sickle blade", base:"A farming sickle (sickle cell)", why:"Sickle = sickle cell. Valentine = valine. Number 6 = position 6." },
+      { id:42, fact:"Target cells seen in: Thalassemia, Liver disease, Hb C, Iron deficiency", top:"Tall ice sundae, a liver, letter C, and broken iron on the target", base:"A bullseye target (target cells)", why:"Bullseye = target cells. Items = Thal, Liver, HbC, Iron def." },
+      { id:43, fact:"Schistocytes seen in DIC, TTP, HUS, and mechanical heart valves", top:"Dice (DIC), toilet paper (TTP), school bus (HUS), gear (valve) piled on ship piece", base:"A broken piece of a ship (schisto = split)", why:"Broken ship = schistocyte. Dice=DIC, TP=TTP, bus=HUS, gear=valve." },
+      { id:44, fact:"Spherocytes seen in Hereditary Spherocytosis and AIHA", top:"A family tree (hereditary) with a robot arm (autoimmune) grabbing the sphere", base:"A perfect sphere/ball (spherocyte)", why:"Sphere = spherocyte. Family tree = hereditary. Robot arm = autoimmune." },
+      { id:45, fact:"Howell-Jolly bodies: nuclear remnants seen after splenectomy", top:"A small dark dot (nuclear remnant) on the wolf's head under the hat", base:"A howling wolf with a jolly Santa hat", why:"Howling jolly wolf = Howell-Jolly. Dark dot = nuclear remnant." },
+      { id:46, fact:"Heinz bodies: denatured hemoglobin in G6PD deficiency, detected with Crystal Violet", top:"A purple crystal (Crystal Violet) on top of the ketchup bottle cap", base:"A bottle of Heinz ketchup", why:"Heinz ketchup = Heinz bodies. Purple crystal = Crystal Violet stain." },
+      { id:47, fact:"G6PD deficiency: X-linked, fava beans trigger, bite cells and Heinz bodies", top:"A fava bean with a bite taken out (bite cells) next to Heinz ketchup", base:"A blue X chromosome (X-linked)", why:"Blue X = X-linked. Bitten fava = bite cells. Heinz = Heinz bodies." },
+      { id:48, fact:"Rouleaux: RBCs stacked like coins, seen in Multiple Myeloma", top:"Multiple test tubes filled with protein shakes on the coin stack", base:"A stack of gold coins (rouleaux)", why:"Coins = rouleaux. Multiple protein shakes = multiple myeloma." },
+      { id:49, fact:"Cold Agglutinin Disease: IgM autoantibody, RBC clumping at cold temps", top:"Red marbles clumped together, sitting on the igloo roof", base:"An igloo (IgM = igloo-M, cold)", why:"Igloo = IgM + cold. Clumped red marbles = RBC agglutination." },
+      { id:50, fact:"Warm AIHA: IgG autoantibody, DAT positive", top:"A giant letter G (IgG) with a DAT sticker, sitting by the campfire", base:"A warm campfire", why:"Campfire = warm. Letter G = IgG. DAT sticker = DAT positive." },
+      { id:51, fact:"HbF (Fetal Hemoglobin) is resistant to alkali denaturation (Kleihauer-Betke)", top:"Alkaline cleaner poured on baby but baby is unharmed", base:"A baby (fetal) wearing an F shirt", why:"Baby F shirt = HbF. Unharmed by alkaline = resistant." },
+    ]
+  },
+  {
+    id: "wbc",
+    title: "WHITE BLOOD CELLS & LEUKEMIA",
+    subtitle: "WBC Differential, Inclusions, Leukemia Classification & Markers",
+    facts: [
+      { id:61, fact:"Normal WBC count: 4,500-11,000/µL", top:"A jersey with numbers 4.5 and 11, draped over the cloud", base:"A white blood cell shaped like a cloud", why:"White cloud = WBC. Jersey 4.5 and 11 = range." },
+      { id:62, fact:"Neutrophils are the most abundant WBC (60-70%)", top:"A gold crown with '60-70%' engraved, on top of the bomb", base:"A neutron bomb (neutrophil = neutron)", why:"Neutron = neutrophil. Gold crown = most abundant." },
+      { id:63, fact:"Left shift = increase in bands, seen in bacterial infection", top:"A rubber band (band cell) on the arrow, with green bacteria dots", base:"A left-pointing arrow (left shift)", why:"Left arrow = left shift. Rubber band = bands. Green = bacteria." },
+      { id:64, fact:"Auer Rods are pathognomonic for AML", top:"A military helmet with 'AML' stamped on it", base:"A golden rod/staff (Auer rod)", why:"Golden rod = Auer rod. Military helmet AML = Acute Myeloid Leukemia." },
+      { id:65, fact:"Faggot cells (bundles of Auer rods) in APL (M3)", top:"An apple with M3 sticker, sitting on the bundle", base:"A bundle of sticks tied together", why:"Bundle = faggot cells. Apple M3 = APL." },
+      { id:66, fact:"APL (M3) treated with ATRA (All-Trans Retinoic Acid)", top:"A giant Vitamin A bottle with 'ATRA' label, on the apple", base:"An apple (APL) with M3 sticker", why:"Apple M3 = APL. Vitamin A ATRA = treatment." },
+      { id:67, fact:"Philadelphia Chromosome t(9;22) associated with CML", top:"Chromosomes with 9 and 22 on them, sitting on the cream cheese", base:"A block of Philadelphia cream cheese", why:"Cream cheese = Philadelphia. Chromosomes 9+22 = t(9;22) in CML." },
+      { id:68, fact:"CML treated with Imatinib (Gleevec) — tyrosine kinase inhibitor", top:"A cage labeled 'Gleevec' trapping the tiger", base:"A tiger (tyrosine kinase = tiger-ine) with 'BCR-ABL' nametag", why:"Tiger = tyrosine kinase. Cage = imatinib/Gleevec." },
+      { id:69, fact:"Smudge cells characteristic of CLL", top:"A clock (chronic) with lymph node balls, on the smudge", base:"A smudged fingerprint (smudge cells)", why:"Smudge = smudge cells. Clock + lymph = CLL." },
+      { id:70, fact:"Hairy Cell Leukemia: TRAP positive, splenomegaly", top:"A bear trap (TRAP) with giant spleen balloon, on the creature", base:"A hairy monster/bigfoot (hairy cell)", why:"Hairy bigfoot = hairy cell. Bear trap = TRAP. Giant spleen." },
+      { id:71, fact:"Toxic granulation seen in severe bacterial infection", top:"Dark purple granules piled on the skull with green bacteria dots", base:"A skull and crossbones (toxic)", why:"Skull = toxic. Purple granules + green dots = infection." },
+      { id:72, fact:"Döhle bodies: light blue inclusions in severe infection", top:"Light blue patches on the doll's body, with bacteria around it", base:"A baby doll (Döhle = dolly)", why:"Doll = Döhle. Blue patches = inclusions. Green = infection." },
+      { id:73, fact:"Reed-Sternberg cells (owl-eye) diagnostic of Hodgkin Lymphoma", top:"A hedge (Hodgkin = hedge-kin) sitting on the owl's head", base:"An owl with giant binocular eyes (owl-eye = Reed-Sternberg)", why:"Owl eyes = Reed-Sternberg. Hedge = Hodgkin." },
+      { id:74, fact:"TdT marker for ALL (Acute Lymphoblastic Leukemia)", top:"A big red 'ALL' sign sitting on the teddy bear", base:"A teddy bear (TdT = teddy)", why:"Teddy = TdT. ALL sign = ALL marker." },
+      { id:75, fact:"Myeloperoxidase (MPO) stain positive in myeloid cells", top:"A bottle of peroxide with 'MPO' label, on the helmet", base:"A military helmet (myeloid = military)", why:"Military = myeloid. Peroxide MPO = myeloperoxidase." },
+      { id:76, fact:"PAS stain positive in ALL (lymphoblasts)", top:"A big red 'ALL' sign sitting on the boarding pass", base:"A boarding pass (PAS = pass)", why:"Boarding pass = PAS. ALL sign = positive in ALL." },
+      { id:77, fact:"Eosinophils associated with allergies and parasites", top:"A peanut (allergy) and worm (parasite) on the bottle cap", base:"A bright pink eosin dye bottle", why:"Eosin bottle = eosinophil. Peanut = allergy. Worm = parasite." },
+      { id:78, fact:"Monocytes are the largest normal WBC in peripheral blood", top:"A giant tape measure showing 'LARGEST' across the monocle", base:"A monocle (monocyte = monocle)", why:"Monocle = monocyte. Tape measure = largest normal WBC." },
+      { id:79, fact:"CD4+ T cells decreased in HIV/AIDS", top:"A red ribbon (HIV/AIDS) draped over the disc, disc is cracked", base:"A CD disc with the number 4 (CD4)", why:"CD disc 4 = CD4. Red ribbon = HIV. Cracked = decreased." },
+      { id:80, fact:"Pelger-Huët anomaly: bilobed (hyposegmented) neutrophils", top:"A pelican wearing pince-nez glasses on its beak", base:"A pair of pince-nez spectacles (bilobed shape)", why:"Pince-nez = bilobed. Pelican = Pelger-Huët." },
+    ]
+  },
+  {
+    id: "plt",
+    title: "PLATELETS & PRIMARY HEMOSTASIS",
+    subtitle: "Platelet Counts, Function, and Disorders",
+    facts: [
+      { id:86, fact:"Normal Platelet count: 150,000-400,000/µL", top:"A parking meter showing $1.50 next to a $400 tag, on the plate", base:"A dinner plate (platelet)", why:"Plate = platelet. $1.50 and $400 = 150K-400K." },
+      { id:87, fact:"ITP: autoimmune platelet destruction, increased megakaryocytes", top:"A giant mega-Karen (megakaryocyte) on top of the scene", base:"A dinner plate being smashed by a robot arm (autoimmune)", why:"Robot arm smashing plate = autoimmune destruction. Mega-Karen = megakaryocytes." },
+      { id:88, fact:"TTP: ADAMTS13 deficiency, pentad of symptoms", top:"A hand with 13 fingers reaching for TP, with 5 stars (pentad)", base:"A toilet paper roll (TTP = TP)", why:"TP = TTP. 13 fingers = ADAMTS13. 5 stars = pentad." },
+      { id:89, fact:"TTP pentad: Fever, Thrombocytopenia, Hemolytic anemia, Renal, Neuro (FAT RN)", top:"A fat nurse (FAT RN) sitting on the TP roll", base:"A toilet paper roll (TTP)", why:"TP = TTP. Fat nurse = FAT RN mnemonic." },
+      { id:90, fact:"HUS: similar to TTP but kidneys, associated with E. coli O157:H7", top:"Two kidneys on the bus roof, with a hot dog between them", base:"A school bus (HUS = bus)", why:"Bus = HUS. Kidneys = renal. Hot dog = E. coli." },
+      { id:91, fact:"DIC: simultaneous clotting and bleeding, consumes all factors", top:"A red sponge with both a clot and blood drops, on the dice", base:"Scattered dice (DIC = disseminated)", why:"Dice = DIC. Sponge = consumption. Clot + drops = both." },
+      { id:92, fact:"HIT (Heparin-Induced Thrombocytopenia): paradoxically causes thrombosis", top:"A blood clot (red ball) on the hair pin, with 'NO BLEEDING' sign", base:"A hair pin with 'HIT' stamped on it", why:"Hair pin HIT = HIT. Red clot = paradoxical thrombosis." },
+    ]
+  },
+  {
+    id: "stains",
+    title: "SPECIAL STAINS & TESTS",
+    subtitle: "Staining Methods, Flow Cytometry & Special Procedures",
+    facts: [
+      { id:96, fact:"Wright stain is the standard peripheral blood smear stain", top:"A glass slide with blood smear, balanced on the airplane wing", base:"The Wright Brothers' airplane (Wright = Wright Brothers)", why:"Airplane = Wright stain. Blood slide = standard smear stain." },
+      { id:97, fact:"Prussian Blue stain detects iron (hemosiderin) — turns iron blue", top:"An iron (clothes iron) turned bright blue, held by the officer", base:"A Prussian military officer in blue uniform", why:"Prussian officer = Prussian Blue. Blue iron = detects iron." },
+      { id:98, fact:"New Methylene Blue (NMB) stain counts reticulocytes", top:"A patterned fishing net (reticulocyte) dipped into the blue paint", base:"A new bottle of blue paint labeled 'NMB'", why:"Blue paint = NMB. Net = reticulocyte counting." },
+      { id:99, fact:"Crystal Violet detects Heinz bodies", top:"A Heinz ketchup bottle on the purple crystal", base:"A purple crystal gemstone (Crystal Violet)", why:"Purple crystal = Crystal Violet. Heinz = Heinz bodies." },
+      { id:100, fact:"LAP score: low in CML, high in leukemoid reaction", top:"Cream cheese making dog sleepy (CML=low), thermometer on other side (reactive=high)", base:"A lap dog (LAP = lap)", why:"Lap dog = LAP. Sleepy + cheese = low CML. Thermometer = high reactive." },
+      { id:101, fact:"NBT test detects Chronic Granulomatous Disease (negative = CGD)", top:"A broken granola bar (negative in CGD), on the blue teddy", base:"A night blue teddy bear (NBT = Night Blue Teddy)", why:"Night blue teddy = NBT. Broken granola = negative = CGD." },
+      { id:102, fact:"Hb Electrophoresis is the gold standard for sickle cell confirmation", top:"A gold medal with electric eel (electrophoresis) on the sickle", base:"A farming sickle (sickle cell)", why:"Sickle = sickle cell. Gold medal + eel = electrophoresis gold standard." },
+    ]
+  },
+  {
+    id: "calc",
+    title: "CALCULATIONS & INDICES",
+    subtitle: "RBC Indices, Formulas & Rule of Three",
+    facts: [
+      { id:106, fact:"MCV = (Hct × 10) / RBC count. Normal: 80-100 fL", top:"A cracked hat (Hct) with '×10' divided by red circles (RBC)", base:"A moving van (MCV)", why:"Van = MCV. Hat × 10 ÷ circles = formula." },
+      { id:107, fact:"MCH = (Hgb × 10) / RBC count. Normal: 27-31 pg", top:"A red globe (Hgb) with '×10' divided by red circles, on the roof", base:"A church (MCH = M-church)", why:"Church = MCH. Globe × 10 ÷ circles = formula." },
+      { id:108, fact:"MCHC = (Hgb / Hct) × 100. Normal: 32-36 g/dL", top:"A red globe divided by cracked hat with '×100'", base:"A church with a C cookie attached (MCHC)", why:"Church + cookie = MCHC. Globe ÷ hat × 100 = formula." },
+      { id:109, fact:"RDW elevated in Iron Deficiency (differentiates from thalassemia)", top:"Broken iron on wide road vs sundae on normal road", base:"A road (RDW = road-width)", why:"Road = RDW. Broken iron on wide road = ↑ in IDA." },
+      { id:110, fact:"Rule of Three: RBC × 3 = Hgb; Hgb × 3 = Hct", top:"Magic wand '×3': circles → globe → cracked hat", base:"Three red circles (RBCs) in a row", why:"Three circles = Rule of Three. ×3 each step." },
+      { id:111, fact:"ANC = WBC × (% segs + % bands). Neutropenia < 1,500", top:"White cloud × rubber band + segment patch, on the anchor", base:"An anchor (ANC = anchor)", why:"Anchor = ANC. Cloud × band + segment = formula." },
+    ]
+  },
+  {
+    id: "misc",
+    title: "MISCELLANEOUS HIGH-YIELD",
+    subtitle: "Additional Board-Critical Facts",
+    facts: [
+      { id:113, fact:"Erythropoietin (EPO) produced by kidneys, stimulates RBC production", top:"EPO cheerleader with red circles multiplying, on kidney beans", base:"Two kidney beans", why:"Kidneys = EPO source. Cheerleader = stimulates RBC." },
+      { id:114, fact:"Polycythemia Vera: JAK2 mutation, increased RBCs/WBCs/platelets", top:"Playing card jack holding 2, surrounded by piles of cells", base:"A polka-dot party (polycythemia = polka-see-themia)", why:"Polka party = polycythemia. Jack 2 = JAK2." },
+      { id:115, fact:"Myelofibrosis: fibrotic marrow, teardrop cells, dry tap", top:"Teardrop gem on fibrous bone, next to dry faucet", base:"A bone with fibers growing out (myelofibrosis)", why:"Fibrous bone = myelofibrosis. Teardrop = dacryocytes. Dry faucet = dry tap." },
+      { id:116, fact:"Infectious Mono (EBV): atypical lymphocytes, positive Monospot", top:"Large oddly-shaped lymph node with virus crown, on the card", base:"A single spot on a card (Monospot)", why:"Spot card = Monospot. Odd lymph = atypical. Crown = EBV." },
+      { id:117, fact:"Basophilic Stippling: seen in lead poisoning and thalassemia", top:"Lead pencil and tall ice sundae on the stippled bass", base:"A bass fish covered in tiny dots (basophilic stippling)", why:"Stippled bass = basophilic stippling. Pencil = lead. Sundae = thal." },
+      { id:118, fact:"Multiple Myeloma: M-protein spike, Bence Jones protein, rouleaux", top:"Spiked letter M, jeans (Bence Jones), coin stack on the tubes", base:"Multiple test tubes (multiple myeloma)", why:"Multiple tubes = myeloma. Spiked M + jeans + coins." },
+      { id:119, fact:"Chediak-Higashi: giant WBC granules, recurrent infections, partial albinism", top:"Giant purple granules on the cheese, pale ghost nearby", base:"A giant cheddar cheese wedge", why:"Cheddar = Chediak-Higashi. Giant granules. Pale ghost = albinism." },
+      { id:120, fact:"Elevated LDH + ↑indirect bilirubin + ↓haptoglobin = intravascular hemolysis", top:"Ladder UP (LDH), yellow ball UP (bilirubin), hippo DOWN (haptoglobin)", base:"A burst red water balloon (hemolysis)", why:"Burst balloon = hemolysis. Ladder↑, yellow↑, hippo↓ = lab triad." },
+      { id:121, fact:"Ringed Sideroblasts diagnostic of Sideroblastic Anemia", top:"A spider sitting in the center of the iron ring", base:"A ring made of tiny iron balls", why:"Iron ring = ringed sideroblasts. Spider = sideroblastic." },
+    ]
+  }
+];
+
+// ===== GENERATE STARS =====
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.style.left = Math.random() * 100 + '%';
+  star.style.top = Math.random() * 100 + '%';
+  star.style.animationDelay = Math.random() * 3 + 's';
+  star.style.animationDuration = (2 + Math.random() * 3) + 's';
+  starsEl.appendChild(star);
+}
+
+// ===== RENDER NAV =====
+const navTabs = document.getElementById('navTabs');
+sections.forEach((s, i) => {
+  const tab = document.createElement('button');
+  tab.className = 'nav-tab';
+  tab.textContent = `0${i+1} ${s.title.split('&')[0].trim()}`;
+  tab.onclick = () => {
+    document.getElementById(`section-${s.id}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  };
+  navTabs.appendChild(tab);
+});
+// Appendix tab
+const appTab = document.createElement('button');
+appTab.className = 'nav-tab';
+appTab.textContent = '★ IMAGE KEY';
+appTab.onclick = () => document.getElementById('appendix').scrollIntoView({ behavior: 'smooth' });
+navTabs.appendChild(appTab);
+
+// ===== RENDER CONTENT =====
+const main = document.getElementById('mainContent');
+
+sections.forEach((section, si) => {
+  const block = document.createElement('div');
+  block.className = 'section-block';
+  block.id = `section-${section.id}`;
+
+  block.innerHTML = `
+    <div class="section-header fade-up">
+      <div class="section-num">0${si+1}</div>
+      <h2 class="section-title">${section.title}</h2>
+      <p class="section-subtitle">${section.subtitle}</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="facts-grid" id="grid-${section.id}"></div>
+  `;
+  main.appendChild(block);
+
+  const grid = document.getElementById(`grid-${section.id}`);
+  section.facts.forEach((f, fi) => {
+    const card = document.createElement('div');
+    card.className = 'fact-card';
+    card.style.transitionDelay = `${fi * 0.05}s`;
+    card.innerHTML = `
+      <div class="card-id">${String(f.id).padStart(3,'0')}</div>
+      <div class="card-content">
+        <div class="card-fact">${f.fact}</div>
+        <div class="image-pair">
+          <div class="img-label top"><span class="arrow">▲</span> TOP IMAGE</div>
+          <div class="img-desc">${f.top}</div>
+          <div class="img-separator"></div>
+          <div class="img-label base"><span class="arrow">▼</span> BASE IMAGE</div>
+          <div class="img-desc">${f.base}</div>
+        </div>
+        <div class="card-why">${f.why}</div>
+      </div>
+    `;
+    card.addEventListener('click', () => openModal(section.id, fi));
+    grid.appendChild(card);
+  });
+});
+
+// ===== APPENDIX =====
+const appendixData = [
+  ["PT","Physical therapy ball"],["PTT","Putt-putt golf"],["INR","Inner tube"],["Warfarin","War fan"],["Heparin","Hair pin"],
+  ["Vitamin K","Kale letter K"],["Hemoglobin","Red globe"],["Hematocrit","Cracked hat"],["MCV","Moving van"],["Ferritin","Ferret"],
+  ["TIBC","Tie-BC"],["Platelet","Dinner plate"],["Neutrophil","Neutron bomb"],["Monocyte","Monocle"],["Eosinophil","Eosin dye bottle"],
+  ["Basophil","Bass fish"],["Reticulocyte","Fishing net"],["Fibrinogen","Fiber optic cables"],["Fibrin","Fishing net"],["Thrombin","Thumb"],
+  ["Sickle Cell","Farming sickle"],["Thalassemia","Tall ice sundae"],["Pernicious Anemia","Toothy purse"],["von Willebrand","VW van"],
+  ["Ristocetin","Wristwatch"],["Philadelphia Chr.","Cream cheese"],["Tyrosine Kinase","Tiger"],["Imatinib","Cage"],
+  ["APL (M3)","Apple + M3"],["ATRA","Vitamin A bottle"],["TdT","Teddy bear"],["Hodgkin","Hedge"],["Reed-Sternberg","Owl eyes"],
+  ["Myeloid","Military helmet"],["LAP score","Lap dog"],["DIC","Scattered dice"],["TTP","Toilet paper"],["HUS","School bus"],
+  ["ADAMTS13","Hand with 13 fingers"],["Lupus","Wolf"],["B12","Bee + 12"],["Folate","Folded foil"],["Intrinsic","ENTER door"],
+  ["Extrinsic","EXIT sign"],["Wright stain","Wright Bros. airplane"],["Prussian Blue","Prussian officer"],["Crystal Violet","Purple crystal"],
+  ["NMB stain","New blue paint"],["EPO","Cheerleader + megaphone"],["D-dimer","Two D's"],["Sudan Black","Sandy black boot"],
+  ["PAS stain","Boarding pass"],["Hemophilia A","Bloody A on figure-8"],["Hemophilia B","Christmas tree on cat"],["Döhle bodies","Baby doll"],
+  ["Heinz bodies","Heinz ketchup"],["Howell-Jolly","Howling wolf + Santa hat"],["Pappenheimer","Paper pen holder"],["Cabot rings","Taxi cab + pretzel"],
+  ["Chediak-Higashi","Cheddar cheese"],["Sézary cells","Scissors"],["Bernard-Soulier","Bear + beret"],["Glanzmann","Glass spectacles"],
+  ["Pelger-Huët","Pelican + pince-nez"],["Multiple Myeloma","Multiple test tubes"],["Bence Jones","Bench jeans"],["Rouleaux","Gold coins"],
+  ["Myelofibrosis","Fibrous bone"],["Polycythemia","Polka-dot party"],["JAK2","Jack of 2"],["ANC","Anchor"],["MCH","Church"],["MCHC","Church + C cookie"],["RDW","Road width"],["NBT test","Night blue teddy"]
+];
+
+const appSection = document.createElement('div');
+appSection.className = 'section-block';
+appSection.id = 'appendix';
+appSection.innerHTML = `
+  <div class="section-header fade-up">
+    <div class="section-num">★</div>
+    <h2 class="section-title">SOUND-ALIKE IMAGE KEY</h2>
+    <p class="section-subtitle">Quick Reference — Medical Term → Memory Image</p>
+    <div class="section-divider"></div>
+  </div>
+  <div class="appendix-grid" id="appendixGrid"></div>
+`;
+main.appendChild(appSection);
+
+const appGrid = document.getElementById('appendixGrid');
+appendixData.forEach(([term, img]) => {
+  const item = document.createElement('div');
+  item.className = 'appendix-item';
+  item.innerHTML = `
+    <span class="appendix-term">${term}</span>
+    <span class="appendix-arrow">→</span>
+    <span class="appendix-image">${img}</span>
+  `;
+  appGrid.appendChild(item);
+});
+
+// ===== SEARCH =====
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.toLowerCase().trim();
+  document.querySelectorAll('.fact-card').forEach(card => {
+    if (!q) {
+      card.style.display = '';
+      return;
+    }
+    const text = card.textContent.toLowerCase();
+    card.style.display = text.includes(q) ? '' : 'none';
+  });
+});
+
+// ===== SCROLL ANIMATIONS =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.fade-up, .fact-card').forEach(el => observer.observe(el));
+
+// ===== NAV HIGHLIGHT ON SCROLL =====
+const sectionEls = sections.map(s => document.getElementById(`section-${s.id}`));
+const tabs = document.querySelectorAll('.nav-tab');
+window.addEventListener('scroll', () => {
+  let current = 0;
+  sectionEls.forEach((el, i) => {
+    if (el && el.getBoundingClientRect().top < 200) current = i;
+  });
+  tabs.forEach(t => t.classList.remove('active'));
+  if (tabs[current]) tabs[current].classList.add('active');
+});
+
+// ===== MODAL SYSTEM =====
+const allFacts = sections.flatMap(s => s.facts);
+let currentModalIndex = -1;
+
+const modalOverlay = document.getElementById('modalOverlay');
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalClose = document.getElementById('modalClose');
+const modalFact = document.getElementById('modalFact');
+const modalTop = document.getElementById('modalTop');
+const modalBase = document.getElementById('modalBase');
+const modalWhy = document.getElementById('modalWhy');
+const modalId = document.getElementById('modalId');
+const modalCounter = document.getElementById('modalCounter');
+const modalPrev = document.getElementById('modalPrev');
+const modalNext = document.getElementById('modalNext');
+
+function openModal(sectionId, factIdx) {
+  const section = sections.find(s => s.id === sectionId);
+  const fact = section.facts[factIdx];
+  // Find global index
+  currentModalIndex = allFacts.findIndex(f => f.id === fact.id);
+  renderModal();
+  modalOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function renderModal() {
+  const f = allFacts[currentModalIndex];
+  if (!f) return;
+  modalFact.textContent = f.fact;
+  modalTop.textContent = f.top;
+  modalBase.textContent = f.base;
+  modalWhy.textContent = f.why;
+  modalId.textContent = String(f.id).padStart(3, '0');
+  modalCounter.textContent = `${currentModalIndex + 1} / ${allFacts.length}`;
+  modalPrev.disabled = currentModalIndex <= 0;
+  modalNext.disabled = currentModalIndex >= allFacts.length - 1;
+  // Scroll modal card back to top
+  document.getElementById('modalCard').scrollTop = 0;
+}
+
+function closeModal() {
+  modalOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+  currentModalIndex = -1;
+}
+
+modalBackdrop.addEventListener('click', closeModal);
+modalClose.addEventListener('click', closeModal);
+modalPrev.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (currentModalIndex > 0) { currentModalIndex--; renderModal(); }
+});
+modalNext.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (currentModalIndex < allFacts.length - 1) { currentModalIndex++; renderModal(); }
+});
+document.addEventListener('keydown', (e) => {
+  if (currentModalIndex < 0) return;
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'ArrowLeft' && currentModalIndex > 0) { currentModalIndex--; renderModal(); }
+  if (e.key === 'ArrowRight' && currentModalIndex < allFacts.length - 1) { currentModalIndex++; renderModal(); }
+});
+</script>
+</body>
+</html>
