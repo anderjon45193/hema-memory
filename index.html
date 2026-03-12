@@ -982,6 +982,315 @@ body {
   text-shadow: 0 0 6px rgba(57,255,20,0.15);
 }
 
+/* ===== MEMORY PALACE DATABASE ===== */
+.palace-section {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+.palace-divider {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+  margin: 0 auto 3rem;
+  box-shadow: 0 0 12px rgba(255,45,123,0.2);
+}
+.palace-title {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  text-align: center;
+  margin-bottom: 0.4rem;
+  color: var(--neon-pink);
+  text-shadow: 0 0 25px rgba(255,45,123,0.25);
+}
+.palace-title-jp {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  text-align: center;
+  font-size: 0.95rem;
+  color: rgba(240,230,255,0.3);
+  margin-bottom: 2.5rem;
+  letter-spacing: 3px;
+}
+.palace-intro {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: rgba(240,230,255,0.7);
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 3rem;
+}
+
+.palace-phase {
+  margin-bottom: 3rem;
+}
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.phase-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  letter-spacing: 2px;
+  padding: 5px 12px;
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  text-shadow: 0 0 6px rgba(0,240,255,0.3);
+  flex-shrink: 0;
+}
+.phase-title {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: 1.1rem;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 8px rgba(255,233,62,0.12);
+}
+.phase-desc {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: rgba(240,230,255,0.65);
+  margin-bottom: 1.25rem;
+}
+.phase-desc em { color: var(--neon-cyan); font-style: normal; }
+.phase-desc strong { color: rgba(240,230,255,0.9); }
+
+/* Walkthrough visual */
+.palace-walkthrough {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  padding: 1.25rem 0.5rem;
+  margin-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,240,255,0.15) transparent;
+}
+.walk-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.walk-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(0,240,255,0.12);
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+.walk-node:hover .walk-icon {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(0,240,255,0.12);
+}
+.walk-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.3rem;
+  color: rgba(240,230,255,0.4);
+  letter-spacing: 1px;
+  text-align: center;
+  max-width: 70px;
+}
+.walk-arrow {
+  font-size: 0.9rem;
+  color: rgba(0,240,255,0.2);
+  padding: 0 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Sub-parts breakdown */
+.subparts-demo {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+.subparts-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.subparts-icon {
+  font-size: 1.4rem;
+}
+.subparts-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  letter-spacing: 2px;
+  color: var(--neon-cyan);
+}
+.subparts-grid {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.subpart-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0,240,255,0.04);
+  border: 1px solid rgba(0,240,255,0.08);
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s;
+}
+.subpart-chip:hover {
+  border-color: rgba(0,240,255,0.2);
+  background: rgba(0,240,255,0.07);
+}
+.subpart-num {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: 0.8rem;
+  color: var(--neon-pink);
+  opacity: 0.6;
+}
+.subpart-text {
+  font-size: 0.78rem;
+  color: rgba(240,230,255,0.7);
+}
+
+/* Chain visual */
+.chain-demo {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,45,123,0.08);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+.chain-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.chain-title-icon { font-size: 1.2rem; }
+.chain-title-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  letter-spacing: 2px;
+  color: var(--neon-pink);
+}
+.chain-sequence {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: 1rem;
+}
+.chain-item {
+  padding: 0.5rem 0.8rem;
+  background: rgba(255,45,123,0.05);
+  border: 1px solid rgba(255,45,123,0.1);
+  font-size: 0.8rem;
+  color: rgba(240,230,255,0.8);
+  flex-shrink: 0;
+}
+.chain-link {
+  font-size: 0.7rem;
+  color: rgba(255,45,123,0.25);
+  padding: 0 0.3rem;
+  flex-shrink: 0;
+}
+.chain-note {
+  font-size: 0.8rem;
+  color: rgba(240,230,255,0.4);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* Attachment visual */
+.attach-demo {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(57,255,20,0.08);
+  padding: 1.5rem;
+}
+.attach-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.attach-title-icon { font-size: 1.2rem; }
+.attach-title-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  letter-spacing: 2px;
+  color: var(--neon-green);
+}
+.attach-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0;
+  flex-wrap: wrap;
+}
+.attach-anchor {
+  font-size: 0.75rem;
+  color: var(--neon-cyan);
+  font-weight: 700;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+.attach-arrow {
+  color: rgba(57,255,20,0.35);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+.attach-chain-label {
+  font-size: 0.7rem;
+  color: rgba(255,45,123,0.5);
+  flex-shrink: 0;
+}
+.attach-arrow2 {
+  color: rgba(255,233,62,0.3);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+.attach-fact {
+  font-size: 0.75rem;
+  color: var(--neon-yellow);
+  opacity: 0.8;
+}
+
+/* Math callout */
+.palace-math {
+  background: linear-gradient(135deg, rgba(255,45,123,0.06), rgba(0,240,255,0.04));
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 1.75rem 2rem;
+  text-align: center;
+  margin-top: 2.5rem;
+}
+.math-line {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+  color: var(--neon-yellow);
+  line-height: 2;
+  text-shadow: 0 0 10px rgba(255,233,62,0.12);
+}
+.math-op {
+  color: var(--neon-pink);
+  padding: 0 0.3rem;
+}
+.math-result {
+  font-family: 'Dela Gothic One', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  color: var(--neon-green);
+  text-shadow: 0 0 20px rgba(57,255,20,0.25);
+  margin-top: 0.5rem;
+}
+.math-subtitle {
+  font-size: 0.8rem;
+  color: rgba(240,230,255,0.35);
+  margin-top: 0.5rem;
+  letter-spacing: 1px;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .facts-grid { grid-template-columns: 1fr; }
@@ -992,6 +1301,12 @@ body {
   .guide-step { flex-direction: column; gap: 0.75rem; }
   .step-number { width: auto; }
   .guide-rules { grid-template-columns: 1fr; }
+  .palace-walkthrough { gap: 0; }
+  .walk-icon { width: 44px; height: 44px; font-size: 1.2rem; }
+  .subparts-grid { flex-direction: column; }
+  .chain-sequence { flex-direction: column; align-items: flex-start; }
+  .chain-link { transform: rotate(90deg); padding: 0.2rem 0; }
+  .attach-row { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
   .modal-body { padding: 2rem 1.25rem 1.5rem; }
   .modal-fact { font-size: 1.05rem; }
 }
@@ -1183,6 +1498,204 @@ body {
       <div class="guide-rule-text"><strong>SOUND-ALIKE</strong><br>Turn abstract words into concrete images using phonetic similarity.</div>
     </div>
   </div>
+</section>
+
+<!-- ===== MEMORY PALACE DATABASE ===== -->
+<section class="palace-section">
+  <div class="palace-divider"></div>
+  <h2 class="palace-title">BUILDING YOUR MEMORY DATABASE</h2>
+  <p class="palace-title-jp">記憶の宮殿 — THE MEMORY PALACE</p>
+
+  <p class="palace-intro">
+    The image pairs above are the <strong>content</strong> — but you need somewhere to <strong>store</strong> them. A memory database gives every fact a permanent home you can walk through and retrieve at will. Here's how to build one using a place you already know.
+  </p>
+
+  <!-- PHASE 1: WALK YOUR SPACE -->
+  <div class="palace-phase fade-up">
+    <div class="phase-header">
+      <span class="phase-badge">PHASE 1</span>
+      <span class="phase-title">Walk Your Space</span>
+    </div>
+    <div class="phase-desc">
+      Choose a place you know well — your house, apartment, a route you walk daily. Now do a <strong>mental walkthrough</strong> and pick out <em>5 major landmarks</em> in a natural order. These are your <strong>support images</strong> — permanent anchors that never change. Walk the same direction every time.
+    </div>
+    <div class="palace-walkthrough">
+      <div class="walk-node">
+        <div class="walk-icon">🚪</div>
+        <div class="walk-label">FRONT DOOR</div>
+      </div>
+      <div class="walk-arrow">→</div>
+      <div class="walk-node">
+        <div class="walk-icon">🪑</div>
+        <div class="walk-label">ENTRY TABLE</div>
+      </div>
+      <div class="walk-arrow">→</div>
+      <div class="walk-node">
+        <div class="walk-icon">🖼️</div>
+        <div class="walk-label">WALL PICTURE</div>
+      </div>
+      <div class="walk-arrow">→</div>
+      <div class="walk-node">
+        <div class="walk-icon">🌸</div>
+        <div class="walk-label">FLOWER VASE</div>
+      </div>
+      <div class="walk-arrow">→</div>
+      <div class="walk-node">
+        <div class="walk-icon">🛋️</div>
+        <div class="walk-label">COUCH</div>
+      </div>
+    </div>
+    <div class="phase-desc" style="font-size:0.85rem; color:rgba(240,230,255,0.45); font-style:italic;">
+      These 5 objects are your anchors. You'll always walk this route in the same order — front door first, couch last.
+    </div>
+  </div>
+
+  <!-- PHASE 2: BREAK INTO SUB-PARTS -->
+  <div class="palace-phase fade-up">
+    <div class="phase-header">
+      <span class="phase-badge">PHASE 2</span>
+      <span class="phase-title">Break Each Anchor Into 5 Sub-Parts</span>
+    </div>
+    <div class="phase-desc">
+      Every support image gets divided into <strong>5 smaller, distinct parts</strong> (maximum). Look at the object closely in your mind and identify 5 physical features you can clearly picture. These sub-parts become individual <em>storage slots</em>.
+    </div>
+    <div class="subparts-demo">
+      <div class="subparts-header">
+        <span class="subparts-icon">🪑</span>
+        <span class="subparts-title">EXAMPLE: ENTRY TABLE → 5 SUB-PARTS</span>
+      </div>
+      <div class="subparts-grid">
+        <div class="subpart-chip">
+          <span class="subpart-num">1</span>
+          <span class="subpart-text">Table top surface</span>
+        </div>
+        <div class="subpart-chip">
+          <span class="subpart-num">2</span>
+          <span class="subpart-text">Corner edge</span>
+        </div>
+        <div class="subpart-chip">
+          <span class="subpart-num">3</span>
+          <span class="subpart-text">Table leg</span>
+        </div>
+        <div class="subpart-chip">
+          <span class="subpart-num">4</span>
+          <span class="subpart-text">Leg base (above wheel)</span>
+        </div>
+        <div class="subpart-chip">
+          <span class="subpart-num">5</span>
+          <span class="subpart-text">Wheel / foot</span>
+        </div>
+      </div>
+    </div>
+    <div class="phase-desc" style="font-size:0.85rem; color:rgba(240,230,255,0.45); font-style:italic;">
+      Do this for all 5 support images. You now have 5 anchors × 5 sub-parts = 25 storage slots.
+    </div>
+  </div>
+
+  <!-- PHASE 3: BUILD CHAINS -->
+  <div class="palace-phase fade-up">
+    <div class="phase-header">
+      <span class="phase-badge">PHASE 3</span>
+      <span class="phase-title">Build 5-Image Chains</span>
+    </div>
+    <div class="phase-desc">
+      Before attaching real content, you need to <strong>extend each slot</strong> with a chain. For each sub-part, create a sequence of <strong>5 random images</strong> linked together in pairs — the same stacking method from the first guide. Pick 5 random objects and connect them one at a time.
+    </div>
+    <div class="chain-demo">
+      <div class="chain-title-row">
+        <span class="chain-title-icon">⛓️</span>
+        <span class="chain-title-text">EXAMPLE CHAIN: 5 RANDOM IMAGES</span>
+      </div>
+      <div class="chain-sequence">
+        <div class="chain-item">🎧 Headphones</div>
+        <div class="chain-link">→</div>
+        <div class="chain-item">🛏️ Pillow</div>
+        <div class="chain-link">→</div>
+        <div class="chain-item">🎀 Bandana</div>
+        <div class="chain-link">→</div>
+        <div class="chain-item">💳 Credit Card</div>
+        <div class="chain-link">→</div>
+        <div class="chain-item">🎈 Water Balloon</div>
+      </div>
+      <div class="chain-note">
+        Visualize each pair for <strong style="color:var(--neon-yellow);">6 seconds</strong> — just two images at a time, static and touching:<br><br>
+        <strong style="color:rgba(240,230,255,0.7);">Pair 1:</strong> A pillow sitting on top of the headphones. (6 sec)<br>
+        <strong style="color:rgba(240,230,255,0.7);">Pair 2:</strong> A bandana draped on top of the pillow. (6 sec)<br>
+        <strong style="color:rgba(240,230,255,0.7);">Pair 3:</strong> A credit card laying on the bandana. (6 sec)<br>
+        <strong style="color:rgba(240,230,255,0.7);">Pair 4:</strong> A water balloon resting on the credit card. (6 sec)<br><br>
+        Then connect the <em>first image of this chain</em> (headphones) to the sub-part slot. The headphones sit on top of the table top surface. Now when you mentally visit that table top, you see headphones → and the whole chain unrolls.
+      </div>
+    </div>
+    <div class="phase-desc" style="font-size:0.85rem; color:rgba(240,230,255,0.45); font-style:italic;">
+      Each chain gives you 5 positions. Build one chain per sub-part. Only visualize two images at a time — never the whole chain at once.
+    </div>
+  </div>
+
+  <!-- PHASE 4: ATTACH REAL CONTENT -->
+  <div class="palace-phase fade-up">
+    <div class="phase-header">
+      <span class="phase-badge">PHASE 4</span>
+      <span class="phase-title">Attach Your Facts</span>
+    </div>
+    <div class="phase-desc">
+      Now each position in each chain becomes a <strong>hook for real content</strong>. Take a fact's image pair from this guide and connect it to the corresponding chain image — the chain image becomes the base, with your fact's image pair stacked on it. Retrieval works by walking your space, finding the sub-part, following the chain, and decoding each fact.
+    </div>
+    <div class="attach-demo">
+      <div class="attach-title-row">
+        <span class="attach-title-icon">📌</span>
+        <span class="attach-title-text">EXAMPLE: RETRIEVAL PATH</span>
+      </div>
+      <div class="attach-row">
+        <span class="attach-anchor">🪑 Table</span>
+        <span class="attach-arrow">→</span>
+        <span class="attach-anchor">Table Top</span>
+        <span class="attach-arrow">→</span>
+        <span class="attach-chain-label">🎧 Headphones</span>
+        <span class="attach-arrow2">→</span>
+        <span class="attach-fact">Fact #1 image pair</span>
+      </div>
+      <div class="attach-row">
+        <span class="attach-anchor">🪑 Table</span>
+        <span class="attach-arrow">→</span>
+        <span class="attach-anchor">Table Top</span>
+        <span class="attach-arrow">→</span>
+        <span class="attach-chain-label">🛏️ Pillow</span>
+        <span class="attach-arrow2">→</span>
+        <span class="attach-fact">Fact #2 image pair</span>
+      </div>
+      <div class="attach-row">
+        <span class="attach-anchor">🪑 Table</span>
+        <span class="attach-arrow">→</span>
+        <span class="attach-anchor">Table Top</span>
+        <span class="attach-arrow">→</span>
+        <span class="attach-chain-label">🎀 Bandana</span>
+        <span class="attach-arrow2">→</span>
+        <span class="attach-fact">Fact #3 image pair</span>
+      </div>
+      <div class="attach-row">
+        <span class="attach-anchor" style="opacity:0.3">⋮</span>
+      </div>
+      <div class="attach-row">
+        <span class="attach-anchor">🪑 Table</span>
+        <span class="attach-arrow">→</span>
+        <span class="attach-anchor">Corner Edge</span>
+        <span class="attach-arrow">→</span>
+        <span class="attach-chain-label">⛓️ New chain...</span>
+        <span class="attach-arrow2">→</span>
+        <span class="attach-fact">Facts #6–10</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATH -->
+  <div class="palace-math fade-up">
+    <div class="math-line">
+      5 anchors <span class="math-op">×</span> 5 sub-parts <span class="math-op">×</span> 5 chain links
+    </div>
+    <div class="math-result">= 125 memory slots</div>
+    <div class="math-subtitle">Exactly enough for every fact in this guide</div>
+  </div>
+
 </section>
 
 <!-- ===== NAV ===== -->
